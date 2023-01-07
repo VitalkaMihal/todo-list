@@ -164,10 +164,9 @@ showCompleted.addEventListener("click", ()=>{
 
 showAll.addEventListener("click", ()=>{
     let check = todo.getElementsByTagName("div");
-    for (let i = check.length - 1; i >= 0; i--){
-        if (check[i].className === "lists"){
-            check[i].style.display = "flex";
-        }}
+    for (let i of check){
+        i.style.display = "flex";
+    };
 });
 
 
@@ -175,7 +174,13 @@ search.addEventListener("input", searchList);
 
 function searchList(){
     let check = todo.querySelectorAll(".text");
+    let checkComplete = todo.querySelectorAll(".textComplete");
     for (let item of check){
+        if (item.textContent.indexOf(search.value) === -1){
+            item.parentNode.style.display = "none";
+        } else {item.parentNode.style.display = "flex";};
+    };
+    for (let item of checkComplete){
         if (item.textContent.indexOf(search.value) === -1){
             item.parentNode.style.display = "none";
         } else {item.parentNode.style.display = "flex";};
