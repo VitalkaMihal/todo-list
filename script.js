@@ -51,7 +51,7 @@ const search = formTwo.getElementsByTagName("input")[0];
 add.addEventListener("click", createList);
 
 function createList(){
-    if (input.value === ""){return}
+    if (input.value === ""){return};
     count++;
     const newList = document.createElement('div');
     newList.classList.add("lists");
@@ -77,16 +77,7 @@ function createList(){
     date.textContent = new Date().getDate() + "." + +new Date().getMonth() +1  + "." + new Date().getFullYear();
     delDate.appendChild(date);
     input.value = "";
-    done.addEventListener("click", ()=>{
-        newList.classList.remove("lists");
-        newList.classList.add("listsComplete");
-        done.classList.remove("done");
-        done.classList.add("doneComplete");
-        text.classList.remove("text");
-        text.classList.add("textComplete");
-        countComplete++;
-        complete.textContent = `Completed: ${countComplete}`;
-    }, {"once": true});
+    
     delList.addEventListener("click", ()=>{
         todo.removeChild(newList);
         count--;
@@ -97,17 +88,34 @@ function createList(){
         all.textContent = `All: ${count}`;
     });
 
+    done.addEventListener("click", ()=>{
+        newList.classList.remove("lists");
+        newList.classList.add("listsComplete");
+        done.classList.remove("done");
+        done.classList.add("doneComplete");
+        text.classList.remove("text");
+        text.classList.add("textComplete");
+        countComplete++;
+        complete.textContent = `Completed: ${countComplete}`;
+    }, {"once": true});
+
 };
+
 const eventHandler = (e) => {
     if (e.key === 'Enter') {
         createList();
+        search.value = "";
         e.preventDefault();
     }
-}
-document.addEventListener('keydown', eventHandler)
+};
 
 
-delAll.addEventListener("click", () => {
+document.addEventListener('keydown', eventHandler);
+
+
+delAll.addEventListener("click", deleteAll);
+
+function deleteAll() {
     let check = todo.getElementsByTagName("div");
         for (let i = 0; i < check.length; i++){
             if (check[i].className === "lists" || check[i].className === "listsComplete"){
@@ -119,9 +127,11 @@ delAll.addEventListener("click", () => {
     countComplete = 0;
     complete.textContent = `Completed: ${countComplete}`;
     all.textContent = `All: ${count}`;
-});
+};
 
-delLast.addEventListener("click", () => {
+delLast.addEventListener("click", deleteLast);
+
+function deleteLast() {
     let check = todo.getElementsByTagName("div");
     for (let i = check.length - 1; i >= 0; i--){
         if (check[i].className === "lists" || check[i].className === "listsComplete"){
@@ -141,7 +151,7 @@ delLast.addEventListener("click", () => {
             };
         }
     }
-});
+};
 
 
 showCompleted.addEventListener("click", ()=>{
@@ -151,6 +161,7 @@ showCompleted.addEventListener("click", ()=>{
             check[i].style.display = "none";
         }}
 });
+
 showAll.addEventListener("click", ()=>{
     let check = todo.getElementsByTagName("div");
     for (let i = check.length - 1; i >= 0; i--){
@@ -158,3 +169,15 @@ showAll.addEventListener("click", ()=>{
             check[i].style.display = "flex";
         }}
 });
+
+
+search.addEventListener("input", searchList);
+
+function searchList(){
+    let check = todo.querySelectorAll(".text");
+    for (let item of check){
+        if (item.textContent.indexOf(search.value) === -1){
+            item.parentNode.style.display = "none";
+        } else {item.parentNode.style.display = "flex";};
+    };
+};
