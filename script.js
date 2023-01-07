@@ -1,7 +1,6 @@
 let count = 0;
 let countComplete = 0;
 
-
 const allTodo = document.getElementById("root");
 allTodo.innerHTML ="<div></div>";
 const container = allTodo.querySelector("div");
@@ -98,7 +97,6 @@ function createList(){
         countComplete++;
         complete.textContent = `Completed: ${countComplete}`;
     }, {"once": true});
-
 };
 
 const eventHandler = (e) => {
@@ -106,12 +104,11 @@ const eventHandler = (e) => {
         createList();
         search.value = "";
         e.preventDefault();
-    }
+    };
 };
 
 
 document.addEventListener('keydown', eventHandler);
-
 
 delAll.addEventListener("click", deleteAll);
 
@@ -149,8 +146,8 @@ function deleteLast() {
                 complete.textContent = `Completed: ${countComplete}`;
                 break;
             };
-        }
-    }
+        };
+    };
 };
 
 
@@ -168,7 +165,6 @@ showAll.addEventListener("click", ()=>{
         i.style.display = "flex";
     };
 });
-
 
 search.addEventListener("input", searchList);
 
