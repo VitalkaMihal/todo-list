@@ -108,6 +108,10 @@ function delList(event) {
     if (event.target.closest('.todo-lists-delDate__delList')){
         count--;
         all.textContent = `All: ${count}`;
+        if (event.target.parentNode.parentNode.closest('.todo-Complete')){
+            countComplete--;
+            complete.textContent = `Completed: ${countComplete}`;
+        }
         localTodos[event.target.parentNode.parentNode.id - 1] = '';
         localStorage.setItem('localTodos' , JSON.stringify(localTodos));
         event.target.parentNode.parentNode.remove();
@@ -235,7 +239,6 @@ function setName(event){
 }
 
 function getName(){
-    console.log(localStorage.length)
     if (localStorage.length){
         let arr = JSON.parse(localStorage.getItem('localTodos'));
         for (let i of arr) {
@@ -272,7 +275,6 @@ function getName(){
             if (i.isChecked == false) {
                 count++;
                 countComplete++;
-                all.textContent = `All: ${count}`;
                 const newList = document.createElement('div');
                 newList.classList.add("todo-Complete");
                 todo.appendChild(newList);
@@ -305,4 +307,6 @@ function getName(){
 };
 
 window.addEventListener('DOMContentLoaded', getName());
+
+
 
