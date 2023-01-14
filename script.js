@@ -115,6 +115,9 @@ function delList(event) {
         localTodos[event.target.parentNode.parentNode.id - 1] = '';
         localStorage.setItem('localTodos' , JSON.stringify(localTodos));
         event.target.parentNode.parentNode.remove();
+        if (localTodos.reduce((a, b) => a + b, '') == ''){
+            localStorage.clear();
+        }
     }
 };
 
