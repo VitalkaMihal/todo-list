@@ -1,5 +1,10 @@
 let count = 0;
 let countComplete = 0;
+let localCount = 0;
+const localTodos = [];
+// localStorage.clear()
+
+
 
 
 const allTodo = document.getElementById("root");
@@ -38,15 +43,17 @@ formTwo.innerHTML =
     </form>`;
     const all = document.querySelector(".todo__info-all");
     const complete = document.querySelector(".todo__info-complete");
-const showAll = formTwo.getElementsByTagName("button")[0];
-const showCompleted = formTwo.getElementsByTagName("button")[1];
-const search = formTwo.getElementsByTagName("input")[0];
+    const showAll = formTwo.getElementsByTagName("button")[0];
+    const showCompleted = formTwo.getElementsByTagName("button")[1];
+    const search = formTwo.getElementsByTagName("input")[0];
+
 
 add.addEventListener("click", createList);
 
 function createList(){
     if (input.value === ""){return};
     count++;
+    localCount++;
     const newList = document.createElement('div');
     newList.classList.add("todo-lists");
     todo.appendChild(newList);
@@ -55,7 +62,8 @@ function createList(){
     done.textContent = "Done";
     newList.appendChild(done);
     const text = document.createElement('div');
-    text.classList.add("todo-lists__text");
+    text.classList.add('todo-lists__text');
+    text.classList.add(`todo-lists__text-${localCount}`);
     text.textContent = input.value;
     newList.appendChild(text);
     all.textContent = `All: ${count}`;
@@ -71,29 +79,41 @@ function createList(){
     date.textContent = new Date().getDate() + "." + +new Date().getMonth() +1  + "." + new Date().getFullYear();
     delDate.appendChild(date);
     input.value = "";
-    
-    delList.addEventListener("click", ()=>{
-        todo.removeChild(newList);
-        count--;
-        if (done.className === "todo-lists__done-Complete"){
-            countComplete--;
-            complete.textContent = `Completed: ${countComplete}`;
-        }
-        all.textContent = `All: ${count}`;
-    });
-
-    done.addEventListener("click", ()=>{
-        newList.classList.remove("todo-lists");
-        newList.classList.add("todo-Complete");
-        done.classList.remove("todo-lists__done");
-        done.classList.add("todo-lists__done-Complete");
-        text.classList.remove("todo-lists__text");
-        text.classList.add("todo-lists__text-Complete");
-        countComplete++;
-        complete.textContent = `Completed: ${countComplete}`;
-    }, {"once": true});
-
+    setName();
+    newList.id = localTodo.id;
 };
+
+
+document.addEventListener('click', delList)
+document.addEventListener('click', done)
+
+
+function done(event){ 
+    if (event.target.closest('.todo-lists__done')){
+        event.target.parentNode.classList.remove("todo-lists");
+        event.target.parentNode.classList.add("todo-Complete");
+        event.target.classList.remove("todo-lists__done");
+        event.target.classList.add("todo-lists__done-Complete");
+        event.target.parentNode.querySelector(".todo-lists__text").classList.add("todo-lists__text-Complete");
+        event.target.parentNode.querySelector(".todo-lists__text").classList.remove("todo-lists__text");
+        countComplete++;
+        complete.textContent = `Completed: ${countComplete}`; 
+        localTodos[event.target.parentNode.id - 1].isChecked = false;
+        localStorage.setItem('localTodos' , JSON.stringify(localTodos));
+    }
+};
+
+
+function delList(event) {
+    if (event.target.closest('.todo-lists-delDate__delList')){
+        count--;
+        all.textContent = `All: ${count}`;
+        localTodos[event.target.parentNode.parentNode.id - 1] = '';
+        localStorage.setItem('localTodos' , JSON.stringify(localTodos));
+        event.target.parentNode.parentNode.remove();
+    }
+};
+
 
 const eventHandler = (e) => {
     if (e.key === 'Enter') {
@@ -121,6 +141,8 @@ function deleteAll() {
     countComplete = 0;
     complete.textContent = `Completed: ${countComplete}`;
     all.textContent = `All: ${count}`;
+    localStorage.clear();
+    localCount = 0;
 };
 
 delLast.addEventListener("click", deleteLast);
@@ -132,15 +154,30 @@ function deleteLast() {
             if (check[i].className === "todo-lists"){
                 todo.removeChild(check[i]);
                 count--;
+                localCount--;
+                localTodos.pop();
                 all.textContent = `All: ${count}`;
+                if (localTodos.length){
+                    localStorage.setItem('localTodos' , JSON.stringify(localTodos));
+                } else {
+                    localStorage.clear();
+                }
+                
                 break;
             };
             if (check[i].className === "todo-Complete"){
                 todo.removeChild(check[i]);
                 count--;
+                localCount--;
                 all.textContent = `All: ${count}`;
                 countComplete--;
                 complete.textContent = `Completed: ${countComplete}`;
+                localTodos.pop();
+                if (localTodos.length){
+                    localStorage.setItem('localTodos' , JSON.stringify(localTodos));
+                } else {
+                    localStorage.clear();
+                }
                 break;
             };
         }
@@ -180,3 +217,92 @@ function searchList(){
         } else {item.parentNode.style.display = "flex";};
     };
 };
+
+
+const localTodo = {
+    id: 1,
+    date: '19:35 17 sept',
+    text: 'Play video games',
+    isChecked: true,
+};
+
+function setName(event){
+    localTodo.id = localCount;
+    localTodo.date = new Date().getDate() + "." + +new Date().getMonth() +1  + "." + new Date().getFullYear();
+    localTodo.text = document.querySelector(`.todo-lists__text-${localCount}`).textContent;
+    localTodos.push(Object.assign({}, localTodo));
+    localStorage.setItem('localTodos' , JSON.stringify(localTodos));
+}
+
+function getName(){
+    console.log(localStorage.length)
+    if (localStorage.length){
+        let arr = JSON.parse(localStorage.getItem('localTodos'));
+        for (let i of arr) {
+            localTodos.push(i);
+            if (i == ''){continue};
+            if (i.isChecked == true) {
+                count++;
+                all.textContent = `All: ${count}`;
+                const newList = document.createElement('div');
+                newList.classList.add("todo-lists");
+                todo.appendChild(newList);
+                const done = document.createElement("button");
+                done.classList.add("todo-lists__done");
+                done.textContent = "Done";
+                newList.appendChild(done);
+                const text = document.createElement('div');
+                text.classList.add('todo-lists__text');
+                text.textContent = i.text;
+                newList.appendChild(text);
+                all.textContent = `All: ${count}`;
+                const delDate = document.createElement('div');
+                delDate.classList.add("todo-lists-delDate");
+                newList.appendChild(delDate);
+                const delList = document.createElement("button");
+                delList.classList.add("todo-lists-delDate__delList");
+                delList.textContent = "Del"
+                delDate.appendChild(delList);
+                const date = document.createElement('div');
+                date.classList.add("todo-lists-delDate__date");
+                date.textContent = i.date;
+                delDate.appendChild(date);
+                newList.id = i.id;
+            }
+            if (i.isChecked == false) {
+                count++;
+                countComplete++;
+                all.textContent = `All: ${count}`;
+                const newList = document.createElement('div');
+                newList.classList.add("todo-Complete");
+                todo.appendChild(newList);
+                const done = document.createElement("button");
+                done.classList.add("todo-lists__done-Complete");
+                done.textContent = "Done";
+                newList.appendChild(done);
+                const text = document.createElement('div');
+                text.classList.add('todo-lists__text-Complete');
+                text.textContent = i.text;
+                newList.appendChild(text);
+                all.textContent = `All: ${count}`;
+                const delDate = document.createElement('div');
+                delDate.classList.add("todo-lists-delDate");
+                newList.appendChild(delDate);
+                const delList = document.createElement("button");
+                delList.classList.add("todo-lists-delDate__delList");
+                delList.textContent = "Del"
+                delDate.appendChild(delList);
+                const date = document.createElement('div');
+                date.classList.add("todo-lists-delDate__date");
+                date.textContent = i.date;
+                delDate.appendChild(date);
+                newList.id = i.id;
+                complete.textContent = `Completed: ${countComplete}`;
+            }
+        }
+        localCount = localTodos[localTodos.length - 1].id;
+    } 
+};
+
+window.addEventListener('DOMContentLoaded', getName());
+
