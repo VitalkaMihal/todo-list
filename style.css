@@ -54,6 +54,10 @@ input {
     align-items: center;
 }
 
+.root-container-lists {
+    width: 100%;
+}
+
 .todo-lists {
     width: 70%;
     min-height: 100px;
