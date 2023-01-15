@@ -1,7 +1,7 @@
-let count = 0;
-let countComplete = 0;
-let localCount = 0;
-const localTodos = [];
+let itemId = 0;
+let localTodos = [];
+
+
 // localStorage.clear()
 
 
@@ -40,173 +40,154 @@ formTwo.innerHTML =
             Show Completed
         </button>
         <input class="todo-form-search__input" type="text" placeholder="search">
-    </form>`;
+    </form>
+    <div  class="root-container-lists"></div>`;
+    const lists = document.querySelector('.root-container-lists')
     const all = document.querySelector(".todo__info-all");
     const complete = document.querySelector(".todo__info-complete");
     const showAll = formTwo.getElementsByTagName("button")[0];
     const showCompleted = formTwo.getElementsByTagName("button")[1];
     const search = formTwo.getElementsByTagName("input")[0];
 
+    let dateNow = () => {
+        let date = new Date();
+        return date.getDate() + "." + (Number(date.getMonth()) +1 )  + "." + date.getFullYear();
+    }
 
-add.addEventListener("click", createList);
 
-function createList(){
+
+
+const generateList = () => {
+    lists.innerHTML = '';
+    for ( let i of localTodos) {
+            if (i.isChecked == false) {
+                all.textContent = `All: ${localTodos.length}`;
+                const newList = document.createElement('div');
+                newList.id = i.id; 
+                newList.classList.add("todo-lists");
+                lists.appendChild(newList);
+                const done = document.createElement("button");
+                done.classList.add("todo-lists__done");
+                done.textContent = "Done";
+                done.id = i.id;
+                newList.appendChild(done);
+                const text = document.createElement('div');
+                text.classList.add('todo-lists__text');
+                text.textContent = i.text;
+                newList.appendChild(text);
+                const delDate = document.createElement('div');
+                delDate.classList.add("todo-lists-delDate");
+                newList.appendChild(delDate);
+                const delList = document.createElement("button");
+                delList.classList.add("todo-lists-delDate__delList");
+                delList.id = i.id;
+                delList.textContent = "Del"
+                delDate.appendChild(delList);
+                const date = document.createElement('div');
+                date.classList.add("todo-lists-delDate__date");
+                date.textContent = i.date;
+                delDate.appendChild(date);
+                const allComplete = localTodos.filter((item) => item.isChecked === true).length;
+            }
+            if (i.isChecked == true) {
+                all.textContent = `All: ${localTodos.length}`;
+                const allComplete = localTodos.filter((item) => item.isChecked === true).length;
+                complete.textContent = `Completed: ${allComplete}`;
+                const newList = document.createElement('div');
+                newList.classList.add("todo-Complete");
+                newList.id = i.id; 
+                lists.appendChild(newList);
+                const done = document.createElement("button");
+                done.classList.add("todo-lists__done-Complete");
+                done.textContent = "Done";
+                done.id = i.id; 
+                newList.appendChild(done);
+                const text = document.createElement('div');
+                text.classList.add('todo-lists__text-Complete');
+                text.textContent = i.text;
+                newList.appendChild(text);
+                const delDate = document.createElement('div');
+                delDate.classList.add("todo-lists-delDate");
+                newList.appendChild(delDate);
+                const delList = document.createElement("button");
+                delList.classList.add("todo-lists-delDate__delList");
+                delList.id = i.id;
+                delList.textContent = "Del"
+                delDate.appendChild(delList);
+                const date = document.createElement('div');
+                date.classList.add("todo-lists-delDate__date");
+                date.textContent = i.date;
+                delDate.appendChild(date);
+                newList.id = i.id;
+            }
+        }
+    };
+
+    function eventHandler(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (input.value === ""){return};
+                itemId++;
+                const listInfo = {
+                    id: itemId,
+                    date: dateNow(),
+                    text: input.value,
+                    isChecked: false
+            };
+            input.value = '';
+            localTodos.push(listInfo);
+            localStorage.setItem('localTodos' , JSON.stringify(localTodos));
+            generateList();
+            search.value = "";
+        }
+    };
+    document.addEventListener('keydown', eventHandler);
+
+add.addEventListener("click", setName);
+
+
+
+function setName(){
     if (input.value === ""){return};
-    count++;
-    localCount++;
-    const newList = document.createElement('div');
-    newList.classList.add("todo-lists");
-    todo.appendChild(newList);
-    const done = document.createElement("button");
-    done.classList.add("todo-lists__done");
-    done.textContent = "Done";
-    newList.appendChild(done);
-    const text = document.createElement('div');
-    text.classList.add('todo-lists__text');
-    text.classList.add(`todo-lists__text-${localCount}`);
-    text.textContent = input.value;
-    newList.appendChild(text);
-    all.textContent = `All: ${count}`;
-    const delDate = document.createElement('div');
-    delDate.classList.add("todo-lists-delDate");
-    newList.appendChild(delDate);
-    const delList = document.createElement("button");
-    delList.classList.add("todo-lists-delDate__delList");
-    delList.textContent = "Del"
-    delDate.appendChild(delList);
-    const date = document.createElement('div');
-    date.classList.add("todo-lists-delDate__date");
-    date.textContent = new Date().getDate() + "." + +new Date().getMonth() +1  + "." + new Date().getFullYear();
-    delDate.appendChild(date);
-    input.value = "";
-    setName();
-    newList.id = localTodo.id;
+    itemId++;
+    const listInfo = {
+        id: itemId,
+        date: dateNow(),
+        text: input.value,
+        isChecked: false
+    };
+    input.value = '';
+    localTodos.push(listInfo);
+    localStorage.setItem('localTodos' , JSON.stringify(localTodos));
+    generateList();
 };
 
 
-document.addEventListener('click', delList)
-document.addEventListener('click', done)
 
 
-function done(event){ 
-    if (event.target.closest('.todo-lists__done')){
-        event.target.parentNode.classList.remove("todo-lists");
-        event.target.parentNode.classList.add("todo-Complete");
-        event.target.classList.remove("todo-lists__done");
-        event.target.classList.add("todo-lists__done-Complete");
-        event.target.parentNode.querySelector(".todo-lists__text").classList.add("todo-lists__text-Complete");
-        event.target.parentNode.querySelector(".todo-lists__text").classList.remove("todo-lists__text");
-        countComplete++;
-        complete.textContent = `Completed: ${countComplete}`; 
-        localTodos[event.target.parentNode.id - 1].isChecked = false;
-        localStorage.setItem('localTodos' , JSON.stringify(localTodos));
-    }
+
+
+const deleteAll = () => {
+    localStorage.clear();
+    localTodos = [];
+    generateList();
+    all.textContent = `All: ${localTodos.length}`;
+    const allComplete = localTodos.filter((item) => item.isChecked === true).length;
+                complete.textContent = `Completed: ${allComplete}`;
 };
-
-
-function delList(event) {
-    if (event.target.closest('.todo-lists-delDate__delList')){
-        count--;
-        all.textContent = `All: ${count}`;
-        if (event.target.parentNode.parentNode.closest('.todo-Complete')){
-            countComplete--;
-            complete.textContent = `Completed: ${countComplete}`;
-        }
-        localTodos[event.target.parentNode.parentNode.id - 1] = '';
-        localStorage.setItem('localTodos' , JSON.stringify(localTodos));
-        event.target.parentNode.parentNode.remove();
-        if (localTodos.reduce((a, b) => a + b, '') == ''){
-            localStorage.clear();
-        }
-    }
-};
-
-
-const eventHandler = (e) => {
-    if (e.key === 'Enter') {
-        createList();
-        search.value = "";
-        e.preventDefault();
-    }
-};
-
-
-document.addEventListener('keydown', eventHandler);
-
 
 delAll.addEventListener("click", deleteAll);
 
-function deleteAll() {
-    let check = todo.getElementsByTagName("div");
-        for (let i = 0; i < check.length; i++){
-            if (check[i].className === "todo-lists" || check[i].className === "todo-Complete"){
-                todo.removeChild(check[i]);
-                i--;
-            };
-        }
-    count = 0;
-    countComplete = 0;
-    complete.textContent = `Completed: ${countComplete}`;
-    all.textContent = `All: ${count}`;
-    localStorage.clear();
-    localCount = 0;
-};
+const deleteLast = () => {
+    localTodos.pop();
+    localStorage.setItem('localTodos' , JSON.stringify(localTodos));
+    generateList();
+    all.textContent = `All: ${localTodos.length}`;
+    const allComplete = localTodos.filter((item) => item.isChecked === true).length;
+                complete.textContent = `Completed: ${allComplete}`;
+}
 
 delLast.addEventListener("click", deleteLast);
-
-function deleteLast() {
-    let check = todo.getElementsByTagName("div");
-    for (let i = check.length - 1; i >= 0; i--){
-        if (check[i].className === "todo-lists" || check[i].className === "todo-Complete"){
-            if (check[i].className === "todo-lists"){
-                todo.removeChild(check[i]);
-                count--;
-                localCount--;
-                localTodos.pop();
-                all.textContent = `All: ${count}`;
-                if (localTodos.length){
-                    localStorage.setItem('localTodos' , JSON.stringify(localTodos));
-                } else {
-                    localStorage.clear();
-                }
-                
-                break;
-            };
-            if (check[i].className === "todo-Complete"){
-                todo.removeChild(check[i]);
-                count--;
-                localCount--;
-                all.textContent = `All: ${count}`;
-                countComplete--;
-                complete.textContent = `Completed: ${countComplete}`;
-                localTodos.pop();
-                if (localTodos.length){
-                    localStorage.setItem('localTodos' , JSON.stringify(localTodos));
-                } else {
-                    localStorage.clear();
-                }
-                break;
-            };
-        }
-    }
-};
-
-
-showCompleted.addEventListener("click", ()=>{
-    let check = todo.getElementsByTagName("div");
-    for (let i = check.length - 1; i >= 0; i--){
-        if (check[i].className === "todo-lists"){
-            check[i].style.display = "none";
-        }}
-});
-
-showAll.addEventListener("click", ()=>{
-    let check = todo.getElementsByTagName("div");
-    for (let i of check){
-        i.style.display = "flex";
-    };
-});
-
 
 search.addEventListener("input", searchList);
 
@@ -225,91 +206,72 @@ function searchList(){
     };
 };
 
-
-const localTodo = {
-    id: 1,
-    date: '19:35 17 sept',
-    text: 'Play video games',
-    isChecked: true,
-};
-
-function setName(event){
-    localTodo.id = localCount;
-    localTodo.date = new Date().getDate() + "." + +new Date().getMonth() +1  + "." + new Date().getFullYear();
-    localTodo.text = document.querySelector(`.todo-lists__text-${localCount}`).textContent;
-    localTodos.push(Object.assign({}, localTodo));
-    localStorage.setItem('localTodos' , JSON.stringify(localTodos));
+const delList = (e) => {
+    if (e.target.closest('.todo-lists-delDate__delList')){
+        let ID = e.target.id;
+        console.log(ID)
+        localTodos = localTodos.filter((i) => i.id != ID);
+        generateList();
+        localStorage.setItem('localTodos' , JSON.stringify(localTodos));
+        all.textContent = `All: ${localTodos.length}`;
+        const allComplete = localTodos.filter((item) => item.isChecked === true).length;
+        complete.textContent = `Completed: ${allComplete}`;
+    }
 }
 
-function getName(){
-    if (localStorage.length){
-        let arr = JSON.parse(localStorage.getItem('localTodos'));
-        for (let i of arr) {
-            localTodos.push(i);
-            if (i == ''){continue};
-            if (i.isChecked == true) {
-                count++;
-                all.textContent = `All: ${count}`;
-                const newList = document.createElement('div');
-                newList.classList.add("todo-lists");
-                todo.appendChild(newList);
-                const done = document.createElement("button");
-                done.classList.add("todo-lists__done");
-                done.textContent = "Done";
-                newList.appendChild(done);
-                const text = document.createElement('div');
-                text.classList.add('todo-lists__text');
-                text.textContent = i.text;
-                newList.appendChild(text);
-                all.textContent = `All: ${count}`;
-                const delDate = document.createElement('div');
-                delDate.classList.add("todo-lists-delDate");
-                newList.appendChild(delDate);
-                const delList = document.createElement("button");
-                delList.classList.add("todo-lists-delDate__delList");
-                delList.textContent = "Del"
-                delDate.appendChild(delList);
-                const date = document.createElement('div');
-                date.classList.add("todo-lists-delDate__date");
-                date.textContent = i.date;
-                delDate.appendChild(date);
-                newList.id = i.id;
-            }
-            if (i.isChecked == false) {
-                count++;
-                countComplete++;
-                const newList = document.createElement('div');
-                newList.classList.add("todo-Complete");
-                todo.appendChild(newList);
-                const done = document.createElement("button");
-                done.classList.add("todo-lists__done-Complete");
-                done.textContent = "Done";
-                newList.appendChild(done);
-                const text = document.createElement('div');
-                text.classList.add('todo-lists__text-Complete');
-                text.textContent = i.text;
-                newList.appendChild(text);
-                all.textContent = `All: ${count}`;
-                const delDate = document.createElement('div');
-                delDate.classList.add("todo-lists-delDate");
-                newList.appendChild(delDate);
-                const delList = document.createElement("button");
-                delList.classList.add("todo-lists-delDate__delList");
-                delList.textContent = "Del"
-                delDate.appendChild(delList);
-                const date = document.createElement('div');
-                date.classList.add("todo-lists-delDate__date");
-                date.textContent = i.date;
-                delDate.appendChild(date);
-                newList.id = i.id;
-                complete.textContent = `Completed: ${countComplete}`;
+document.querySelector('.root-container-lists').addEventListener('click', delList);
+
+const done = (e) => {
+    if (e.target.closest('.todo-lists__done')){
+        let ID = e.target.id;
+        for (let i of localTodos){
+            if (i.id == ID) {
+                i.isChecked = true;
             }
         }
-        localCount = localTodos[localTodos.length - 1].id;
-    } 
+    }
+    localStorage.setItem('localTodos' , JSON.stringify(localTodos));
+    generateList();
+    all.textContent = `All: ${localTodos.length}`;
+}
+
+document.querySelector('.root-container-lists').addEventListener('click', done);
+
+
+let getName = () => {
+    if (localStorage.length){
+        localTodos = JSON.parse(localStorage.getItem('localTodos')).filter((i) => i);
+        itemId = localTodos.length;
+        generateList();
+    }
 };
 
 window.addEventListener('DOMContentLoaded', getName());
+
+
+
+
+
+
+showCompleted.addEventListener("click", ()=>{
+    let check = lists.getElementsByTagName("div");
+    for (let i = check.length - 1; i >= 0; i--){
+        if (check[i].className === "todo-lists"){
+            check[i].style.display = "none";
+        }}
+});
+
+showAll.addEventListener("click", ()=>{
+    let check = lists.getElementsByTagName("div");
+    for (let i of check){
+        i.style.display = "flex";
+    };
+});
+
+
+
+
+
 
 
 
