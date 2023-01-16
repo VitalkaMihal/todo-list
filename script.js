@@ -1,10 +1,13 @@
+import  { dateNow } from './date.js';
+
 let allInfo = {
     itemId: 0,
     localTodos: [],
     allComplete: 0
-}
+};
 
 let {itemId, localTodos, allComplete} = allInfo;
+
 
 const allTodo = document.getElementById("root");
 allTodo.innerHTML ="<div></div>";
@@ -49,11 +52,6 @@ formTwo.innerHTML = `
     const showAll = formTwo.getElementsByTagName("button")[0];
     const showCompleted = formTwo.getElementsByTagName("button")[1];
     const search = formTwo.getElementsByTagName("input")[0];
-
-    let dateNow = () => {
-        let date = new Date();
-        return date.getDate() + "." + (Number(date.getMonth()) +1 )  + "." + date.getFullYear();
-    }
 
 const generateList = () => {
     lists.innerHTML = '';
@@ -100,21 +98,7 @@ const generateList = () => {
     function eventHandler(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            if (input.value === ""){
-                search.value = "";
-                return;
-            };
-            itemId++;
-            const listInfo = {
-                id: itemId,
-                date: dateNow(),
-                text: input.value,
-                isChecked: false
-            };
-            input.value = '';
-            localTodos.push(listInfo);
-            localStorage.setItem('localTodos' , JSON.stringify(localTodos));
-            generateList();
+            setName()
             search.value = "";
         }
     };
@@ -201,13 +185,13 @@ let getName = () => {
 };
 
 
-showCompleted.addEventListener("click", ()=>{
+let showDone = () => {
     let check = lists.getElementsByTagName("div");
     for (let i = check.length - 1; i >= 0; i--){
         if (check[i].className === "todo-lists"){
             check[i].style.display = "none";
         }}
-});
+};
 
 showAll.addEventListener("click", ()=>{
     let check = lists.getElementsByTagName("div");
@@ -219,10 +203,11 @@ showAll.addEventListener("click", ()=>{
 
 document.addEventListener('keydown', eventHandler);
 add.addEventListener("click", setName);
-window.addEventListener('DOMContentLoaded', getName());
+window.addEventListener('DOMContentLoaded', getName);
 document.querySelector('.root-container-lists').addEventListener('click', done);
 document.querySelector('.root-container-lists').addEventListener('click', delList);
 delLast.addEventListener("click", deleteLast);
 delAll.addEventListener("click", deleteAll);
 search.addEventListener("input", searchList);
+showCompleted.addEventListener("click", showDone);
 
