@@ -1,8 +1,10 @@
-let itemId = 0;
-let localTodos = [];
-let completed = {
+let allInfo = {
+    itemId: 0,
+    localTodos: [],
     allComplete: 0
 }
+
+let {itemId, localTodos, allComplete} = allInfo;
 
 const allTodo = document.getElementById("root");
 allTodo.innerHTML ="<div></div>";
@@ -21,25 +23,26 @@ const delLast = formOne.getElementsByTagName("button")[1];
 const add = formOne.querySelectorAll("button")[2];
 const formTwo = todo.getElementsByTagName("form")[1];
 formTwo.innerHTML = `
-<div class="todo__info">
-    <div class="todo__info-all">
-        All: 0
+    <div class="todo__info">
+        <div class="todo__info-all">
+            All: 0
+        </div>
+        <div class="todo__info-complete">
+            Completed: 0
+        </div>
     </div>
-    <div class="todo__info-complete">
-        Completed: 0
+        <form class="todo-form-search">
+            <button class="button todo-form-search__button-showAll" type="button">
+                Show All
+            </button>
+            <button class="button todo-form-search__button-showCompleted" type="button">
+                Show Completed
+            </button>
+            <input class="todo-form-search__input" type="text" placeholder="search">
+        </form>
+    <div  class="root-container-lists">
     </div>
-</div>
-    <form class="todo-form-search">
-        <button class="button todo-form-search__button-showAll" type="button">
-            Show All
-        </button>
-        <button class="button todo-form-search__button-showCompleted" type="button">
-            Show Completed
-        </button>
-        <input class="todo-form-search__input" type="text" placeholder="search">
-    </form>
-    <div  class="root-container-lists"></div>
-    `;
+`;
     const lists = document.querySelector('.root-container-lists')
     const all = document.querySelector(".todo__info-all");
     const complete = document.querySelector(".todo__info-complete");
@@ -80,8 +83,6 @@ const generateList = () => {
                 date.classList.add("todo-lists-delDate__date");
                 date.textContent = i.date;
                 delDate.appendChild(date);
-                completed.allComplete = localTodos.filter((item) => item.isChecked === true).length;
-                complete.textContent = `Completed: ${completed.allComplete}`;
             if (i.isChecked === true) {
                 newList.classList.add("todo-Complete");
                 newList.classList.remove("todo-lists");
@@ -92,14 +93,15 @@ const generateList = () => {
             }
         }
         all.textContent = `All: ${localTodos.length}`;
-        completed.allComplete = localTodos.filter((item) => item.isChecked === true).length;
-        complete.textContent = `Completed: ${completed.allComplete}`;
+        allComplete = localTodos.filter((item) => item.isChecked === true).length;
+        complete.textContent = `Completed: ${allComplete}`;
     };
 
     function eventHandler(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
             if (input.value === ""){
+                search.value = "";
                 return;
             };
             itemId++;
@@ -138,7 +140,7 @@ const deleteAll = () => {
     localStorage.clear();
     localTodos = [];
     all.textContent = `All: ${localTodos.length}`;
-    completed.allComplete = localTodos.filter((item) => item.isChecked === true).length;
+    allComplete = localTodos.filter((item) => item.isChecked === true).length;
     generateList();
 };
 
@@ -146,7 +148,7 @@ const deleteLast = () => {
     localTodos.pop();
     localStorage.setItem('localTodos' , JSON.stringify(localTodos));
     all.textContent = `All: ${localTodos.length}`;
-    completed.allComplete = localTodos.filter((item) => item.isChecked === true).length;
+    allComplete = localTodos.filter((item) => item.isChecked === true).length;
     generateList();
 }
 
@@ -171,7 +173,7 @@ const delList = (e) => {
         localTodos = localTodos.filter((i) => i.id !== Number(id));
         localStorage.setItem('localTodos' , JSON.stringify(localTodos));
         all.textContent = `All: ${localTodos.length}`;
-        completed.allComplete = localTodos.filter((item) => item.isChecked === true).length;
+        allComplete = localTodos.filter((item) => item.isChecked === true).length;
         generateList();
     }
 }
@@ -187,12 +189,12 @@ const done = (e) => {
     }
     localStorage.setItem('localTodos' , JSON.stringify(localTodos));
     generateList();
+    console.log(12)
 }
 
 let getName = () => {
-    if (localStorage){
-        localTodos = JSON.parse(localStorage.getItem('localTodos')).filter((i) => i);
-
+    if (localStorage.length){
+        localTodos = JSON.parse(localStorage.getItem('localTodos'));
         itemId = localTodos.length;
         generateList();
     }
@@ -223,12 +225,4 @@ document.querySelector('.root-container-lists').addEventListener('click', delLis
 delLast.addEventListener("click", deleteLast);
 delAll.addEventListener("click", deleteAll);
 search.addEventListener("input", searchList);
-
-
-
-
-
-
-
-
 
