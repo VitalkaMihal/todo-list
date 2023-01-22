@@ -1,13 +1,18 @@
 import  { dateNow } from './date.js';
+import { deleteAll } from './delAll.js';
+import { setName } from './setName.js';
+import { showAllList } from './showAll.js';
+import { showDone } from './showDone.js';
+import { deleteLast } from './delLast.js';
+import { searchList } from './search.js';
+import { delList } from './delList.js';
+import { done } from './done.js';
+import { getName } from './getName.js';
 
-let allInfo = {
+let startInfo = {
     itemId: 0,
-    localTodos: [],
-    allComplete: 0
+    localTodos: []
 };
-
-let {itemId, localTodos, allComplete} = allInfo;
-
 
 const allTodo = document.getElementById("root");
 allTodo.innerHTML ="<div></div>";
@@ -53,9 +58,10 @@ formTwo.innerHTML = `
     const showCompleted = formTwo.getElementsByTagName("button")[1];
     const search = formTwo.getElementsByTagName("input")[0];
 
+
 const generateList = () => {
     lists.innerHTML = '';
-    for ( let i of localTodos) {
+    for ( let i of startInfo.localTodos) {
                 const newList = document.createElement('div');
                 newList.id = i.id; 
                 newList.classList.add("todo-lists");
@@ -90,124 +96,31 @@ const generateList = () => {
                 text.classList.remove('todo-lists__text');
             }
         }
-        all.textContent = `All: ${localTodos.length}`;
-        allComplete = localTodos.filter((item) => item.isChecked === true).length;
-        complete.textContent = `Completed: ${allComplete}`;
+        all.textContent = `All: ${startInfo.localTodos.length}`;
+        complete.textContent = `Completed: ${startInfo.localTodos.filter((item) => item.isChecked === true).length}`;
     };
 
     function eventHandler(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            setName()
+            setName(input, startInfo, dateNow, generateList);
             search.value = "";
         }
     };
 
-function setName(){
-    if (input.value === ""){
-        return;
-    };
-    itemId++;
-    const listInfo = {
-        id: itemId,
-        date: dateNow(),
-        text: input.value,
-        isChecked: false
-    };
-    input.value = '';
-    localTodos.push(listInfo);
-    localStorage.setItem('localTodos' , JSON.stringify(localTodos));
-    generateList();
-};
-
-const deleteAll = () => {
-    localStorage.clear();
-    localTodos = [];
-    all.textContent = `All: ${localTodos.length}`;
-    allComplete = localTodos.filter((item) => item.isChecked === true).length;
-    generateList();
-};
-
-const deleteLast = () => {
-    localTodos.pop();
-    localStorage.setItem('localTodos' , JSON.stringify(localTodos));
-    all.textContent = `All: ${localTodos.length}`;
-    allComplete = localTodos.filter((item) => item.isChecked === true).length;
-    generateList();
+const searchParams = {
+    todo, 
+    search,
 }
 
-function searchList(){
-    let check = todo.querySelectorAll(".todo-lists__text");
-    let checkComplete = todo.querySelectorAll(".todo-lists__text-Complete");
-    for (let item of check){
-        if (item.textContent.indexOf(search.value) === -1){
-            item.parentNode.style.display = "none";
-        } else {item.parentNode.style.display = "flex";};
-    };
-    for (let item of checkComplete){
-        if (item.textContent.indexOf(search.value) === -1){
-            item.parentNode.style.display = "none";
-        } else {item.parentNode.style.display = "flex";};
-    };
-};
-
-const delList = (e) => {
-    if (e.target.closest('.todo-lists-delDate__delList')){
-        let id = e.target.id;
-        localTodos = localTodos.filter((i) => i.id !== Number(id));
-        localStorage.setItem('localTodos' , JSON.stringify(localTodos));
-        all.textContent = `All: ${localTodos.length}`;
-        allComplete = localTodos.filter((item) => item.isChecked === true).length;
-        generateList();
-    }
-}
-
-const done = (e) => {
-    if (e.target.closest('.todo-lists__done')){
-        let id = e.target.id;
-        for (let i of localTodos){
-            if (i.id === Number(id)) {
-                i.isChecked = true;
-            }
-        }
-    }
-    localStorage.setItem('localTodos' , JSON.stringify(localTodos));
-    generateList();
-    console.log(12)
-}
-
-let getName = () => {
-    if (localStorage.length){
-        localTodos = JSON.parse(localStorage.getItem('localTodos'));
-        itemId = localTodos.length;
-        generateList();
-    }
-};
-
-
-let showDone = () => {
-    let check = lists.getElementsByTagName("div");
-    for (let i = check.length - 1; i >= 0; i--){
-        if (check[i].className === "todo-lists"){
-            check[i].style.display = "none";
-        }}
-};
-
-showAll.addEventListener("click", ()=>{
-    let check = lists.getElementsByTagName("div");
-    for (let i of check){
-        i.style.display = "flex";
-    };
-});
-
-
+showAll.addEventListener("click", ()=> showAllList(lists));
 document.addEventListener('keydown', eventHandler);
-add.addEventListener("click", setName);
-window.addEventListener('DOMContentLoaded', getName);
-document.querySelector('.root-container-lists').addEventListener('click', done);
-document.querySelector('.root-container-lists').addEventListener('click', delList);
-delLast.addEventListener("click", deleteLast);
-delAll.addEventListener("click", deleteAll);
-search.addEventListener("input", searchList);
-showCompleted.addEventListener("click", showDone);
+add.addEventListener("click",() => setName(input, startInfo, dateNow, generateList ));
+window.addEventListener('DOMContentLoaded',() => getName(startInfo, generateList));
+document.querySelector('.root-container-lists').addEventListener('click', (e) => done(e)(startInfo, generateList));
+document.querySelector('.root-container-lists').addEventListener('click',(e) => delList(e)(startInfo, generateList));
+delLast.addEventListener("click",() => deleteLast(startInfo.localTodos, generateList));
+delAll.addEventListener("click", () => deleteAll(generateList, startInfo.localTodos));
+search.addEventListener("input",() => searchList(searchParams));
+showCompleted.addEventListener("click", () => showDone(lists));
 
